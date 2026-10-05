@@ -1,0 +1,12 @@
+[submodule "lib/AampSharp"]
+	path = lib/AampSharp
+	url = git@github.com:BladesawStudios/AampSharp.git
+[submodule "lib/BymlSharp"]
+	path = lib/BymlSharp
+	url = git@github.com:BladesawStudios/BymlSharp.git
+[submodule "lib/SarcSharp"]
+	path = lib/SarcSharp
+	url = git@github.com:BladesawStudios/SarcSharp.git
+[submodule "lib/ZsDicSharp"]
+	path = lib/ZsDicSharp
+	url = git@github.com:BladesawStudios/ZsDicSharp.git
