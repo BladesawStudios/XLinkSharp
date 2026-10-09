@@ -256,6 +256,7 @@ sealed class XLinkReader(byte[] d)
         {
             ct.WatchPropertyName = Name(Ptr(x));
             ct.WatchPropertyId = S32(x + P);
+            ct.WatchPropertyIndex = S16(x + P + 4);
             ct.IsGlobal = d[x + P + 6] != 0;
             ct.IsAction = d[x + P + 7] != 0;
         }

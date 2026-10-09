@@ -98,6 +98,8 @@ public sealed class Container
     public int ChildrenEnd { get; set; }
     public string? WatchPropertyName { get; set; }
     public int WatchPropertyId { get; set; }
+    /// <summary>The index into the local property names. Only its sign is used: negative means no local property. The writer assigns real indices.</summary>
+    public int WatchPropertyIndex { get; set; } = -1;
     public bool IsGlobal { get; set; }
     public bool IsAction { get; set; }
     public string? Property1Name { get; set; }
@@ -135,7 +137,7 @@ public sealed class Trigger
     public ushort OverwriteHash { get; set; }
     public SwitchCondition? Condition { get; set; }
     public List<KeyValuePair<string, ParamValue>>? Overwrite { get; set; }
-    public bool IsPrevious => (Flag & 0x10) != 0;
+    public bool IsPrevious => (Flag & 0x10) != 0 && (Flag & 0xC) == 0;
 }
 
 public sealed class Action
@@ -163,7 +165,7 @@ public sealed class User
     public uint NameHash { get; set; }
     public string? Name { get; set; }
     public uint IsSetup { get; set; }
-    public short Unknown { get; set; }
+    public short Unknown { get; set; } = -1;
     public List<string> LocalProperties { get; } = [];
     public List<KeyValuePair<string, ParamValue>> Params { get; } = [];
     public List<AssetCall> AssetCalls { get; } = [];
@@ -209,6 +211,12 @@ public sealed class XLinkFile
     public static XLinkFile FromFile(string path) => FromBinary(File.ReadAllBytes(path));
 
     public byte[] ToBinary() => new XLinkWriter(this).Write();
+
+    /// <summary>The file in the text form of the xlink2 tool.</summary>
+    public string ToText() => XLinkTextWriter.Write(this);
+
+    /// <summary>Reads the text form of the xlink2 tool; the text only names the module, so the game is given here.</summary>
+    public static XLinkFile FromText(string text, XLinkGame game = XLinkGame.Totk) => XLinkTextParser.Parse(text, game);
 
     public void WriteTo(string path) => File.WriteAllBytes(path, ToBinary());
 

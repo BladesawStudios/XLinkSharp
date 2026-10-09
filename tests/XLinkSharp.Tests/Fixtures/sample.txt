@@ -1,0 +1,296 @@
+Metadata {
+  ModuleType = ELink
+}
+ParamDefines {
+  SystemUserParams {
+  }
+  CustomUserParams {
+    Radius = 1.0
+    Tag = "none"
+    Level = 0
+  }
+  SystemAssetParams {
+    AssetName = ""
+    Delay = 0.0
+    Clip = 0x0
+    Enabled = false
+    Bits = 0
+  }
+  CustomAssetParams {
+    Group = <custom>
+  }
+  TriggerParams {
+    Delay = 0.0
+    Scale = 1.0
+  }
+}
+Users {
+  Demo {
+    Unknown = 3
+    UserParams {
+      Radius = RANDOM {
+        Type = InflectedPolynomial
+        Power = 3.0
+        Min = 0.5
+        Max = 2.5
+      }
+      Tag = "a b\n\"q\""
+      Level = 7
+    }
+    LocalProperties {
+      Mode
+      Speed
+    }
+    ActionSlots {
+      Slot {
+        @Prefix
+        Walk {
+          0x00000010 {
+            Type = FrameWindow
+            Start = 4
+            End = 20
+            Unknown1 = 0
+            Unknown2 = 1
+            Oneshot = true
+            Asset = Loop[0x00000003]
+            OverwriteParams =  {
+              Delay = 0.25
+            }
+          }
+          0x00000011 {
+            Type = Previous
+            Start = 0
+            End = 2147483647
+            PreviousAction = Run
+            Unknown1 = 0
+            Unknown2 = 0
+            Oneshot = false
+            Asset = Loop[0x00000003]
+          }
+        }
+        Run {
+        }
+      }
+    }
+    Properties {
+      Local::Speed {
+        if <value> >= 2.5 => 0x00000020 {
+          Lazy = true
+          Unknown = 0
+          Asset = Loop[0x00000003]
+        }
+      }
+      Global::Weather {
+        if <value> == Weather::Rain => 0x00000021 {
+          Lazy = false
+          Unknown = 0
+          Asset = Loop[0x00000003]
+        }
+      }
+    }
+    AlwaysTriggers {
+      0x00000030 {
+        Flags = 0
+        Unknown = 0
+        Asset = Burst[0x00000005]
+      }
+    }
+    AssetCallTables {
+      Main[0x00000001] {
+        EmitCount = 1
+        Oneshot = false
+        NoPause = true
+        UserFlags = 0b101
+        @Unknown = -1
+        Execute = Switch (Local::Mode) {
+          (<value> == Mode::Fast) => Loop[0x00000003] {
+            EmitCount = 1
+            Oneshot = false
+            NoPause = false
+            UserFlags = 0b0
+            Execute = Asset {
+              AssetName = "fx_loop"
+              Delay = 0.5
+              Clip = 0x2
+              Enabled = true
+              Bits = 0b11
+              Group = ARRANGE {
+                G1 {
+                  LimitType = NewestThenPriority
+                  Threshold = 4
+                  IncludeFading = true
+                }
+              }
+            }
+          }
+          (_) => Burst[0x00000005] {
+            EmitCount = 2
+            Oneshot = true
+            NoPause = false
+            UserFlags = 0b0
+            Execute = Asset {
+              AssetName = "fx_burst"
+            }
+          }
+        }
+      }
+      Pick[0x00000006] {
+        EmitCount = 1
+        Oneshot = false
+        NoPause = false
+        UserFlags = 0b0
+        Execute = Random {
+          1.0 => Alt[0x00000015] {
+            EmitCount = 1
+            Oneshot = false
+            NoPause = false
+            UserFlags = 0b0
+            Execute = Asset {
+              AssetName = "alt"
+            }
+          }
+          2.5 => Extra[0x00000007] {
+            EmitCount = 1
+            Oneshot = false
+            NoPause = false
+            UserFlags = 0b0
+            Execute = Asset {
+              AssetName = "fx_extra"
+              Delay = CURVE {
+                Type = Standard
+                Property = Local::Speed
+                Unknown = 0
+                UpdateType = Update
+                Points = {
+                  (0.0, 0.0)
+                  (1.0, 2.5)
+                }
+              }
+            }
+          }
+        }
+      }
+      Chain[0x00000008] {
+        EmitCount = 1
+        Oneshot = false
+        NoPause = false
+        UserFlags = 0b0
+        Execute = Sequence {
+          First[0x00000009] {
+            EmitCount = 1
+            Oneshot = false
+            NoPause = false
+            UserFlags = 0b0
+            Execute = Asset {
+              AssetName = "one"
+            }
+          }
+          @ForceContinue = 1
+          Second[0x0000000a] {
+            EmitCount = 1
+            Oneshot = false
+            NoPause = false
+            UserFlags = 0b0
+            Execute = Asset {
+              AssetName = "two"
+            }
+          }
+        }
+      }
+      Fade[0x0000000b] {
+        EmitCount = 1
+        Oneshot = false
+        NoPause = false
+        UserFlags = 0b0
+        @Unknown = -1
+        Execute = BlendBy (Global::Wind) {
+          ([Min: 0.0, Op: None], [Max: 0.5, Op: Multiply]) => Soft[0x0000000c] {
+            EmitCount = 1
+            Oneshot = false
+            NoPause = false
+            UserFlags = 0b0
+            Execute = Asset {
+              AssetName = "soft"
+            }
+          }
+          ([Min: 0.5, Op: Add], [Max: 1.0, Op: None]) => Hard[0x0000000d] {
+            EmitCount = 1
+            Oneshot = false
+            NoPause = false
+            UserFlags = 0b0
+            Execute = Asset {
+              AssetName = "hard"
+            }
+          }
+        }
+      }
+      Mix[0x0000000e] {
+        EmitCount = 1
+        Oneshot = false
+        NoPause = false
+        UserFlags = 0b0
+        Execute = Blend {
+          MixA[0x0000000f] {
+            EmitCount = 1
+            Oneshot = false
+            NoPause = false
+            UserFlags = 0b0
+            Execute = Asset {
+              AssetName = "a"
+            }
+          }
+          MixB[0x00000010] {
+            EmitCount = 1
+            Oneshot = false
+            NoPause = false
+            UserFlags = 0b0
+            Execute = Asset {
+              AssetName = "b"
+            }
+          }
+        }
+      }
+      Table[0x00000011] {
+        EmitCount = 1
+        Oneshot = false
+        NoPause = false
+        UserFlags = 0b0
+        Execute = Grid (Local::Mode, Global::Weather) {
+          Cases {
+            (Mode::Fast, Weather::Rain) => Cell1[0x00000012]
+            (Mode::Fast, Weather::Sun) => <null>
+            (Mode::Slow, Weather::Rain) => <null>
+            (Mode::Slow, Weather::Sun) => Cell2[0x00000013]
+          }
+          Children {
+            Cell1[0x00000012] {
+              EmitCount = 1
+              Oneshot = false
+              NoPause = false
+              UserFlags = 0b0
+              Execute = Asset {
+                AssetName = "cell1"
+              }
+            }
+            Cell2[0x00000013] {
+              EmitCount = 1
+              Oneshot = false
+              NoPause = false
+              UserFlags = 0b0
+              Execute = Asset {
+                AssetName = "cell2"
+              }
+            }
+          }
+        }
+      }
+      Hop[0x00000014] {
+        EmitCount = 1
+        Oneshot = false
+        NoPause = false
+        UserFlags = 0b0
+        Execute = Jump => Cell1[0x00000012]
+      }
+    }
+  }
+}

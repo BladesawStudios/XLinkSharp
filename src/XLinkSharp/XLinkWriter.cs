@@ -387,7 +387,8 @@ sealed class XLinkWriter
 
     (int Start, int End) Range(ref int cursor, int count)
     {
-        if (count == 0) return (-1, 0);
+        // An empty range has its end before its start, so a loop from start to end does nothing.
+        if (count == 0) return (cursor, cursor - 1);
         var r = (cursor, cursor + count - 1);
         cursor += count;
         return r;
